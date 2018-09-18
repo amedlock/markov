@@ -76,7 +76,7 @@ proc addWord*( phrase:Phrase, word: string, freq: int = 1 ) =
 
 proc load*( markov: Markov, fname: string ) =
   if not existsFile(fname):
-    echo("Data file $1 was not found!  Skipping")
+    echo("Data file $1 was not found!  Skipping".format( fname ))
     return
   var con = db_sqlite.open(fname, nil,nil,nil)
   for row in con.fastRows(sql("SELECT id, txt, prefix, suffix FROM phrase ORDER BY id ASC")):
