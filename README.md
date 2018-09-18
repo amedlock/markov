@@ -41,5 +41,8 @@ This option (which happens after generating sentences) writes the markov generat
 
 **The save option will clear out all data if the datafile exists.**
 
+For corpus, project gutenberg is a good source of text.  Of course just about any grammatically valid text will do.
+
 Have fun.
+
 -David Medlock
