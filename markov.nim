@@ -25,11 +25,11 @@ type
 
 proc isfirstWord( s : string) : bool = 
   const Leading = {'A'..'Z', '"'}
-  result = not(s.isNilOrEmpty) and (s[0] in Leading)
+  result = not(s.len==0) and (s[0] in Leading)
   
 proc islastWord( s : string ) : bool = 
   const Punct : set[char]= { '.', '!', '?', ';' }
-  result = not(s.isNilOrEmpty) and (s[^1] in Punct)
+  result = not(s.len==0) and (s[^1] in Punct)
 
 
 # Data model methods ----------------------
@@ -76,9 +76,9 @@ proc addWord*( phrase:Phrase, word: string, freq: int = 1 ) =
 
 proc load*( markov: Markov, fname: string ) =
   if not existsFile(fname):
-    echo("Data file $1 was not found!  Skipping".format( fname ))
+    echo("Data file $1 was not found!  Skipping")
     return
-  var con = db_sqlite.open(fname, nil,nil,nil)
+  var con = db_sqlite.open(fname, "","","")
   for row in con.fastRows(sql("SELECT id, txt, prefix, suffix FROM phrase ORDER BY id ASC")):
     let id = row[0].parseInt
     var phrase = markov.addPhrase( row[1] )
@@ -101,7 +101,7 @@ proc init( con : DbConn ) =
   con.exec( sql("CREATE INDEX follow_idx on follow( word );") )  
 
 proc save*( markov:Markov, fname : string ) =
-  let con = db_sqlite.open(fname, nil,nil,nil)
+  let con = db_sqlite.open(fname, "","", "")
   con.init() # blow it away
   con.exec(sql("BEGIN TRANSACTION;"))
   for word, phrase in markov.phrases:
@@ -146,7 +146,7 @@ proc toUtf( s : string ): string =
 proc learn*( markov: Markov, text : string ) =
   for line in text.splitLines:
     for word in line.allWords:
-      if not word.isNilOrEmpty:
+      if not word.len==0:
         markov.shift( word )
 
 
