@@ -145,11 +145,9 @@ proc toUtf( s : string ): string =
 
 proc learn*( markov: Markov, text : string ) =
   for line in text.splitLines:
-    var c = 0
     for word in line.allWords:
       if not (word.len==0):
         markov.shift( word )
-        inc(c)
 
 
 proc learnFile*( markov:Markov, name: string ) =
