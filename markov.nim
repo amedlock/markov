@@ -228,7 +228,6 @@ when defined(MarkovCmd):
       m.load( cfg.load )
     for f in cfg.files:
       m.learnFile( f )
-      echo $f
     echo( m.generate( cfg.count ) )
     if cfg.save!="":
       m.save( cfg.save )
