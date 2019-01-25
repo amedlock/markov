@@ -145,9 +145,11 @@ proc toUtf( s : string ): string =
 
 proc learn*( markov: Markov, text : string ) =
   for line in text.splitLines:
+    var c = 0
     for word in line.allWords:
-      if not word.len==0:
+      if not (word.len==0):
         markov.shift( word )
+        inc(c)
 
 
 proc learnFile*( markov:Markov, name: string ) =
@@ -222,12 +224,13 @@ when defined(MarkovCmd):
 
   proc doMarkov(cfg: Cfg) =
     var m = newMarkov( cfg.order )
-    if cfg.load!=nil:
+    if cfg.load!="":
       m.load( cfg.load )
     for f in cfg.files:
       m.learnFile( f )
+      echo $f
     echo( m.generate( cfg.count ) )
-    if cfg.save!=nil:
+    if cfg.save!="":
       m.save( cfg.save )
 
   if defined(MarkovCmd):
@@ -237,7 +240,7 @@ when defined(MarkovCmd):
 
     var cfg = Cfg(files: @[], order:2, count:500)
     var opts = initOptParser()
-    var cmd : string = nil
+    var cmd : string = ""
     for kind, key, val in opts.getopt():
       case kind
       of cmdArgument:
@@ -248,10 +251,10 @@ when defined(MarkovCmd):
         elif cmd=="read":
           cfg.files.add( key )
         elif cmd=="load": 
-          assert( cfg.load==nil )
+          assert( cfg.load=="" )
           cfg.load = key
         elif cmd=="save":
-          assert( cfg.save==nil ) 
+          assert( cfg.save=="" ) 
           cfg.save = key;
         else: 
           echo("Unknown command: $1".format(cmd))
