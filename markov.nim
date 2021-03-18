@@ -41,11 +41,11 @@ proc newMarkov*( sz: int ): Markov =
   
 
 proc addPhrase*( markov:Markov, word:string ) : Phrase =
-  if word in markov.phrases:
-    return markov.phrases[word]
+  let ws = word.strip()
+  if markov.phrases.hasKey(ws):
+    return markov.phrases[ws]
   new(result)
   result.total = 0
-  var ws = word.strip()
   markov.phrases[ws] = result
   if ws.isFirstWord:
     markov.head.add( ws )
