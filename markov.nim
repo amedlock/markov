@@ -1,4 +1,4 @@
-import strutils, tables, sequtils, random
+import strutils, tables, random
 import db_sqlite, os
 import encodings
 
@@ -18,7 +18,7 @@ type
   Markov* = ref object
     size: int
     phrases : Table[string,Phrase]
-    head: seq[string] 
+    head: seq[string]
     tail : seq[string] 
     fragment: seq[string] # used for generation and learning
 
@@ -38,10 +38,6 @@ proc newMarkov*( sz: int ): Markov =
   new(result)
   assert( sz > 1 )
   result.size = sz
-  result.fragment = @[]
-  result.phrases = initTable[string,Phrase]()
-  result.head = @[]
-  result.tail = @[]
   
 
 proc addPhrase*( markov:Markov, word:string ) : Phrase =
@@ -49,7 +45,6 @@ proc addPhrase*( markov:Markov, word:string ) : Phrase =
     return markov.phrases[word]
   new(result)
   result.total = 0
-  result.items = initOrderedTable[string,Follow]()
   var ws = word.strip()
   markov.phrases[ws] = result
   if ws.isFirstWord:
@@ -75,7 +70,7 @@ proc addWord*( phrase:Phrase, word: string, freq: int = 1 ) =
 #  Persistence to sqlite ----------------
 
 proc load*( markov: Markov, fname: string ) =
-  if not existsFile(fname):
+  if not fileExists(fname):
     echo("Data file $1 was not found!  Skipping")
     return
   var con = db_sqlite.open(fname, "","","")
@@ -151,7 +146,7 @@ proc learn*( markov: Markov, text : string ) =
 
 
 proc learnFile*( markov:Markov, name: string ) =
-  if not existsFile(name):
+  if not fileExists(name):
     echo("Text file $1 was not found, skipping")
   else:
     markov.learn( readFile( name ).toUtf )
@@ -169,7 +164,7 @@ proc find_next( markov:Markov, start : string ) : string =
   return ""
 
 proc sentence( markov: Markov ) : seq[string] =
-  var phrase = rand( markov.head )
+  var phrase = sample( markov.head )
   result = @[ phrase ]
   var count= markov.size
   while true:
@@ -179,7 +174,7 @@ proc sentence( markov: Markov ) : seq[string] =
       break
     inc(count)
     if count >= MaxWords or follow=="":
-      result.add( rand(markov.tail) )
+      result.add( sample(markov.tail) )
       break
     let rest = phrase.split(WhiteSpace,1)[1]
     phrase = [rest, follow].join(" ").strip()

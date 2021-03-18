@@ -1,5 +1,5 @@
 # markov
-A Markov Text generator in Nim (v 0.19)
+A Markov Text generator in Nim (v 1.4.2)
 
 Uses markov chains (https://en.wikipedia.org/wiki/Markov_chain) to generate nonsensical but somewhat grammatically valid text from one or more text files.
 
